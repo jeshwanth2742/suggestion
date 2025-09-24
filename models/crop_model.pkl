@@ -1,0 +1,23 @@
+# src/predict.py
+
+import pickle
+import os
+import numpy as np
+
+# Load trained model
+model_path = os.path.join(os.path.dirname(__file__), '..', 'models', 'crop_model.pkl')
+with open(model_path, 'rb') as f:
+    saved = pickle.load(f)
+
+model = saved['model']
+le = saved['label_encoder']
+
+def predict_crop(features):
+    """
+    features: list of [N, P, K, temperature, humidity, ph, rainfall]
+    returns: crop name (string)
+    """
+    features = np.array(features).reshape(1, -1)
+    pred_encoded = model.predict(features)[0]
+    crop_name = le.inverse_transform([pred_encoded])[0]
+    return crop_name
